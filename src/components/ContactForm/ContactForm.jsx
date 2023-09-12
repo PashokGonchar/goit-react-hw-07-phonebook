@@ -1,53 +1,49 @@
-import { useEffect, useState } from 'react';
 import { nanoid } from 'nanoid';
 import { Form, Input, Label, SubmitButton } from './ContactForm.styled';
-import { useDispatch, useSelector } from 'react-redux';
 import Notiflix from 'notiflix';
-import { add } from 'redux/contactsSlice';
+import { useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { addContacts } from 'redux/operations';
 
 const ContactFormPage = () => {
+ 
   const [name, setName] = useState('');
-  const [number, setNumber] = useState('');
-  
-  const {contacts} = useSelector((state)=> state.contacts)
+  const [phone, setPhone] = useState('');
+
+  const contacts = useSelector(state => state.contactsSlice.contacts.items);
   const dispatch = useDispatch();
-  
-  useEffect(() => {
-    localStorage.setItem('contacts', JSON.stringify(contacts));
-  }, [contacts]);
 
   const handleInputName = e => {
-     setName(e.target.value);
-    };
+    setName(e.target.value);
+  };
   const handleInputNumber = e => {
-     setNumber(e.target.value);
-    };
+    setPhone(e.target.value);
+  };
 
-    const handleSubmitForm = e => {
-      e.preventDefault();
+  const handleSubmitForm = e => {
+    e.preventDefault();
 
     if (contacts.some(contact => contact.name === name)) {
       Notiflix.Notify.info(`${name} вже існує!`);
       return;
     }
 
-    if (contacts.some(contact => contact.number === number)) {
-      Notiflix.Notify.info(`${number} вже є у цьому списку контактів!`);
+    if (contacts.some(contact => contact.phone === phone)) {
+      Notiflix.Notify.info(`${phone} вже є у цьому списку контактів!`);
       return;
     }
 
     const newContact = {
       name,
-      number,
+      phone,
       id: nanoid(),
     };
 
-      dispatch(add(newContact))
-    
-      setName('');
-      setNumber('');
-  };
+    dispatch(addContacts(newContact));
 
+    setName('');
+    setPhone('');
+  };
 
   return (
     <Form onSubmit={handleSubmitForm}>
@@ -65,16 +61,16 @@ const ContactFormPage = () => {
       <Label htmlFor="number">Number</Label>
       <Input
         type="tel"
-        name="number"
+        name="phone"
         pattern="^[+]?[0-9\\.\\-\\s]{1,15}$"
         title="Phone number must be digits and can contain spaces, dashes, parentheses and can start with +"
         required
-        value={number}
+        value={phone}
         onChange={handleInputNumber}
       />
       <SubmitButton type="submit">Add Contacts</SubmitButton>
     </Form>
   );
-}
+};
 
 export default ContactFormPage;
