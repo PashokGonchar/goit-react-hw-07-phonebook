@@ -3,27 +3,29 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useEffect } from 'react';
 import { deleteContacts, fetchContacts } from 'redux/operations';
 import Loader from 'components/Loader/Loader';
-import { nanoid } from 'nanoid';
 
 const ContactListPage = () => {
   const dispatch = useDispatch();
 
   const contacts = useSelector(state => state.contactsSlice.contacts.items);
 
-  // const filter = useSelector(
-  //   state => state.contactsSlice.contacts.filter.value
-  // );
+  const filter = useSelector(
+    state => state.contactsSlice.contacts.filter.value
+  );
 
-  // const normalizedFilter = filter.toLowerCase();
-  // const filteredContacts = contacts.filter(contact =>
-  //   contact.name.toLowerCase().includes(normalizedFilter)
-  // );
+const getFilteredContacts = () => {
+  const normalizedFilter = filter.toLowerCase();
+  return contacts.filter(contact =>
+    contact.name.toLowerCase().includes(normalizedFilter)
+  );
+};
+const filteredContacts = getFilteredContacts();
 
   const isLoading = useSelector(state => state.contactsSlice.isLoading);
   const error = useSelector(state => state.contactsSlice.error);
 
   useEffect(() => {
-    dispatch(fetchContacts()).then(res => console.log('res', res));
+    dispatch(fetchContacts())
   }, [dispatch]);
 
   return (
@@ -32,8 +34,8 @@ const ContactListPage = () => {
         {error && <li>{error}</li>}
 
         {isLoading && <Loader />}
-        {contacts.map(({ id, name, phone }) => (
-          <ListLi key={nanoid()}>
+        {filteredContacts.map(({ id, name, phone }) => (
+          <ListLi key={id}>
             {name}:{phone}
             <ListBtn type="button" onClick={() => dispatch(deleteContacts(id))}>
               Delete contact

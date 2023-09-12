@@ -14,8 +14,24 @@ export const fetchContacts = createAsyncThunk(
       }
 
       const data = await response.json();
-console.log("data", data)
       return data;
+    } catch (error) {
+      return rejectWithValue(error.message);
+    }
+  }
+);
+
+export const deleteContacts = createAsyncThunk(
+  'contacts/deleteContacts',
+  async function (id, { rejectWithValue, dispatch }) {
+    try {
+      const response = await fetch(`${CONTACTS_API}/contacts/${id}`, {
+        method: 'DELETE',
+      });
+      if (!response.ok) {
+        throw new Error('Sorry we cant delete your contact');
+      }
+      dispatch(removeContact(id));
     } catch (error) {
       return rejectWithValue(error.message);
     }
@@ -27,7 +43,6 @@ export const addContacts = createAsyncThunk(
   async function (data, { rejectWithValue, dispatch }) {
     try {
       const contact = {
-        id:data.id,
         name: data.name,
         phone: data.phone,
       };
@@ -44,29 +59,16 @@ export const addContacts = createAsyncThunk(
         throw new Error('Sorry cant add your contact');
       }
 
-      dispatch(setContact(data));
-    } catch (error) {
-      return rejectWithValue(error.message);
-    }
-  }
-);
+      const responseData = await response.json();
+      const realId = responseData.id;
 
-export const deleteContacts = createAsyncThunk(
-  'contacts/deleteContacts',
-  async function (id, { rejectWithValue, dispatch }) {
-    try {
-      console.log("id", id);
-      const response = await fetch(`${CONTACTS_API}/contacts/${id}`, {
-        method: 'DELETE',
-      });
+      const updatedContact = {
+        name: data.name,
+        phone: data.phone,
+        id: realId,
+      };
 
-      if (!response.ok) {
-        console.log(2);
-        throw new Error('Sorry we cant delete your contact');
-      }
-      console.log(3);
-      dispatch(removeContact(id));
-      console.log(4);
+      dispatch(setContact(updatedContact));
     } catch (error) {
       return rejectWithValue(error.message);
     }

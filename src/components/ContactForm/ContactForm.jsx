@@ -1,4 +1,3 @@
-import { nanoid } from 'nanoid';
 import { Form, Input, Label, SubmitButton } from './ContactForm.styled';
 import Notiflix from 'notiflix';
 import { useState } from 'react';
@@ -36,7 +35,6 @@ const ContactFormPage = () => {
     const newContact = {
       name,
       phone,
-      id: nanoid(),
     };
 
     dispatch(addContacts(newContact));
@@ -56,7 +54,6 @@ const ContactFormPage = () => {
         required
         value={name}
         onChange={handleInputName}
-        id={nanoid()}
       />
       <Label htmlFor="number">Number</Label>
       <Input
